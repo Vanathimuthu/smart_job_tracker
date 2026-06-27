@@ -1,30 +1,31 @@
 from datetime import timedelta
 from pathlib import Path
-import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SECRET_KEY = "dev-secret-key"
+DEBUG = True
+ALLOWED_HOSTS = ["*"]
 
-def load_env_file(path):
-    if not path.exists():
-        return
+AI_PROVIDER = "groq"
 
-    for line in path.read_text().splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
+OPENAI_API_KEY = None
+GROQ_API_KEY = None
+GROQ_MODEL = "llama-3.1-8b-instant"
 
-        key, value = line.split("=", 1)
-        key = key.strip()
-        value = value.strip().strip('"').strip("'")
-        os.environ.setdefault(key, value)
+DB_NAME = "job_tracker"
+DB_USER = "postgres"
+DB_PASSWORD = "Rockbby@1322"
+DB_HOST = "localhost"
+DB_PORT = "5432"
 
-
-load_env_file(BASE_DIR / ".env")
-
-SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
-DEBUG = os.environ.get("DEBUG", "1") == "1"
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
+EMAIL_HOST_USER = "vanathivanathi52@gmail.com"
+EMAIL_HOST_PASSWORD = "whuv owvs ooip uvfo"
+EMAIL_TIMEOUT = 10
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -77,38 +78,16 @@ TEMPLATES = [
 WSGI_APPLICATION = "smart_job_tracker.wsgi.application"
 ASGI_APPLICATION = "smart_job_tracker.asgi.application"
 
-DB_NAME = os.getenv("DB_NAME", "")
-DB_USER = os.getenv("DB_USER", "")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "")
-DB_HOST = os.getenv("DB_HOST", "")
-DB_PORT = os.getenv("DB_PORT", "5432")
-
-if DB_HOST:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": DB_NAME,
-            "USER": DB_USER,
-            "PASSWORD": DB_PASSWORD,
-            "HOST": DB_HOST,
-            "PORT": DB_PORT,
-        }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": DB_NAME,
+        "USER": DB_USER,
+        "PASSWORD": DB_PASSWORD,
+        "HOST": DB_HOST,
+        "PORT": DB_PORT,
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
-
-EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
-EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "1").lower() in {"1", "true", "yes"}
-EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", 10))
+}
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
@@ -146,4 +125,3 @@ SIMPLE_JWT = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
-DEBUG=True

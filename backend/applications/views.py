@@ -1,4 +1,3 @@
-import os
 import re
 from django.conf import settings
 from rest_framework import generics, permissions, status
@@ -108,7 +107,7 @@ class ResumeAnalysisView(APIView):
 
         response_payload = self._build_fallback_response(resume_text, job_description)
 
-        api_key = os.environ.get("OPENAI_API_KEY") or getattr(settings, "OPENAI_API_KEY", None)
+        api_key = getattr(settings, "OPENAI_API_KEY", None)
         if openai and api_key:
             try:
                 client = openai.OpenAI(api_key=api_key)

@@ -82,7 +82,7 @@ Authorization: Bearer <admin_token>
 
 ## Email Configuration
 
-Reminders require email to be configured in Django. Check your `.env` file:
+Reminders require email to be configured in Django. Check `backend/smart_job_tracker/settings.py`:
 
 ```
 EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
@@ -153,7 +153,7 @@ python manage.py send_interview_reminders --hours 24
 - Try refreshing the page
 
 ### Emails Not Sending?
-- Check `.env` email configuration
+- Check `settings.py` email configuration
 - Test with: `python manage.py shell`
   ```python
   from django.core.mail import send_mail
@@ -178,7 +178,7 @@ These flags prevent duplicate reminders when running the command multiple times.
 ## Next Steps
 
 1. ✅ Test browser notifications first (no setup needed)
-2. ✅ Configure email in `.env` if you want email reminders
+2. ✅ Configure email in `settings.py` if you want email reminders
 3. ✅ Set up a cron job or scheduler to run reminders regularly
 4. ✅ Test with a future interview
 

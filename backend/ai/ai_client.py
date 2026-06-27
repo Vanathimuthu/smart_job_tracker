@@ -1,6 +1,5 @@
 import importlib
 import json
-import os
 
 from django.conf import settings
 
@@ -24,13 +23,13 @@ class AIQuotaError(AIServiceError):
 
 
 def get_provider_name():
-    provider = os.environ.get("AI_PROVIDER") or getattr(settings, "AI_PROVIDER", "")
+    provider = getattr(settings, "AI_PROVIDER", "")
     provider = provider.strip().lower()
     if provider:
         return provider
-    if os.environ.get("GROQ_API_KEY"):
+    if getattr(settings, "GROQ_API_KEY", None):
         return "groq"
-    if os.environ.get("GROK_API_KEY") or os.environ.get("XAI_API_KEY"):
+    if getattr(settings, "GROK_API_KEY", None) or getattr(settings, "XAI_API_KEY", None):
         return "grok"
     return "openai"
 
@@ -53,14 +52,14 @@ def normalize_openai_error(exc):
 def get_model_name():
     provider = get_provider_name()
     if provider == "groq":
-        return os.environ.get("GROQ_MODEL") or getattr(settings, "GROQ_MODEL", "llama-3.1-8b-instant")
+        return getattr(settings, "GROQ_MODEL", "llama-3.1-8b-instant")
     if provider in {"grok", "xai"}:
         return (
-            os.environ.get("GROK_MODEL")
-            or os.environ.get("XAI_MODEL")
-            or getattr(settings, "GROK_MODEL", "grok-2-latest")
+            getattr(settings, "GROK_MODEL", None)
+            or getattr(settings, "XAI_MODEL", None)
+            or "grok-2-latest"
         )
-    return os.environ.get("OPENAI_MODEL") or getattr(settings, "OPENAI_MODEL", "gpt-4o-mini")
+    return getattr(settings, "OPENAI_MODEL", "gpt-4o-mini")
 
 
 def get_client():
@@ -70,25 +69,20 @@ def get_client():
     provider = get_provider_name()
 
     if provider == "groq":
-        api_key = os.environ.get("GROQ_API_KEY") or getattr(settings, "GROQ_API_KEY", None)
+        api_key = getattr(settings, "GROQ_API_KEY", None)
         if not api_key:
-            raise AIConfigurationError("GROQ_API_KEY is missing. Add it to backend/.env and restart Django.")
+            raise AIConfigurationError("GROQ_API_KEY is missing. Add it to Django settings and restart the server.")
         return OpenAI(api_key=api_key, base_url="https://api.groq.com/openai/v1")
 
     if provider in {"grok", "xai"}:
-        api_key = (
-            os.environ.get("GROK_API_KEY")
-            or os.environ.get("XAI_API_KEY")
-            or getattr(settings, "GROK_API_KEY", None)
-            or getattr(settings, "XAI_API_KEY", None)
-        )
+        api_key = getattr(settings, "GROK_API_KEY", None) or getattr(settings, "XAI_API_KEY", None)
         if not api_key:
-            raise AIConfigurationError("GROK_API_KEY or XAI_API_KEY is missing. Add it to backend/.env and restart Django.")
+            raise AIConfigurationError("GROK_API_KEY or XAI_API_KEY is missing. Add it to Django settings and restart the server.")
         return OpenAI(api_key=api_key, base_url="https://api.x.ai/v1")
 
-    api_key = os.environ.get("OPENAI_API_KEY") or getattr(settings, "OPENAI_API_KEY", None)
+    api_key = getattr(settings, "OPENAI_API_KEY", None)
     if not api_key:
-        raise AIConfigurationError("OPENAI_API_KEY is missing. Add it to backend/.env and restart Django.")
+        raise AIConfigurationError("OPENAI_API_KEY is missing. Add it to Django settings and restart the server.")
     return OpenAI(api_key=api_key)
 
 
